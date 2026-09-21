@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "wouter";
 import { toast } from "sonner";
+import { trpc } from "@/lib/trpc";
+import { coverFor, mediaFor, MediaImage, PLACEHOLDER_IMAGE, type PublicMedia } from "@/lib/media";
 import {
   ArrowDownRight,
   ArrowLeft,
@@ -27,18 +29,6 @@ import {
   X,
 } from "lucide-react";
 
-const images = {
-  hero: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=2400&q=90",
-  welcome: "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=1400&q=85",
-  unit1: "https://images.unsplash.com/photo-1602002418082-a4443e081dd1?auto=format&fit=crop&w=1400&q=85",
-  unit2: "https://images.unsplash.com/photo-1582610116397-edb318620f90?auto=format&fit=crop&w=1400&q=85",
-  unit3: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1400&q=85",
-  unit4: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1400&q=85",
-  detail1: "https://images.unsplash.com/photo-1602002418082-a4443e081dd1?auto=format&fit=crop&w=2000&q=90",
-  detail2: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=85",
-  detail3: "https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=1200&q=85",
-};
-
 type Unit = {
   id: string;
   number: string;
@@ -48,7 +38,6 @@ type Unit = {
   beds: string;
   bath: string;
   size: string;
-  image: string;
   availability: string;
 };
 
@@ -62,7 +51,6 @@ export const units: Unit[] = [
     beds: "1 king bed",
     bath: "1 bath",
     size: "45 m²",
-    image: images.unit1,
     availability: "Availability on request",
   },
   {
@@ -74,7 +62,6 @@ export const units: Unit[] = [
     beds: "2 beds",
     bath: "1 bath",
     size: "58 m²",
-    image: images.unit2,
     availability: "Availability on request",
   },
   {
@@ -86,7 +73,6 @@ export const units: Unit[] = [
     beds: "2 beds",
     bath: "1 bath",
     size: "62 m²",
-    image: images.unit3,
     availability: "Availability on request",
   },
   {
@@ -98,7 +84,6 @@ export const units: Unit[] = [
     beds: "2 beds",
     bath: "1 bath",
     size: "52 m²",
-    image: images.unit4,
     availability: "Availability on request",
   },
 ];
@@ -217,12 +202,13 @@ function BookingBar({ preselectedUnit = "" }: { preselectedUnit?: string }) {
   );
 }
 
-function UnitCard({ unit }: { unit: Unit }) {
+function UnitCard({ unit, media }: { unit: Unit; media: PublicMedia[] }) {
   const [saved, setSaved] = useState(false);
+  const cover = coverFor(media, "unit", unit.id);
   return (
     <article className="unit-card">
       <div className="unit-card__media">
-        <img src={unit.image} alt={`${unit.name} at Le Grande`} />
+        <MediaImage src={cover?.imageUrl || PLACEHOLDER_IMAGE} alt={cover?.imageAlt || `${unit.name} at Le Grande`} />
         <div className="unit-card__veil" />
         <span className="unit-card__number">UNIT {unit.number}</span>
         <button className={`save-button ${saved ? "save-button--saved" : ""}`} type="button" aria-label="Save unit" onClick={() => setSaved(!saved)}>
@@ -277,7 +263,12 @@ function Amenities() {
   );
 }
 
-function Gallery() {
+function Gallery({ media }: { media: PublicMedia[] }) {
+  const gallery = mediaFor(media, "property-gallery");
+  const hero = coverFor(media, "hero");
+  const propertyImage = gallery[0] || hero;
+  const unitsImage = gallery[1] || propertyImage;
+  const detailImage = gallery[2] || unitsImage;
   return (
     <section className="gallery section-ivory" id="gallery">
       <div className="container">
@@ -286,10 +277,10 @@ function Gallery() {
           <p>Light, texture, and the little moments that make a stay feel like your own.</p>
         </div>
         <div className="gallery-grid">
-          <figure className="gallery-tile gallery-tile--large"><img src={images.welcome} alt="Le Grande pool and tropical landscape" /><figcaption>THE PROPERTY <ArrowUpRight size={15} /></figcaption></figure>
-          <figure className="gallery-tile"><img src={images.detail2} alt="Quiet bedroom interior" /><figcaption>THE UNITS <ArrowUpRight size={15} /></figcaption></figure>
-          <figure className="gallery-tile"><img src={images.detail3} alt="Warmly lit residence interior" /><figcaption>THE DETAILS <ArrowUpRight size={15} /></figcaption></figure>
-          <figure className="gallery-tile gallery-tile--wide"><img src={images.hero} alt="Le Grande resort-style exterior" /><figcaption>THE EXPERIENCE <ArrowUpRight size={15} /></figcaption></figure>
+          <figure className="gallery-tile gallery-tile--large"><MediaImage src={propertyImage?.imageUrl || PLACEHOLDER_IMAGE} alt={propertyImage?.imageAlt || "Le Grande pool and tropical landscape"} /><figcaption>THE PROPERTY <ArrowUpRight size={15} /></figcaption></figure>
+          <figure className="gallery-tile"><MediaImage src={unitsImage?.imageUrl || PLACEHOLDER_IMAGE} alt={unitsImage?.imageAlt || "Quiet bedroom interior"} /><figcaption>THE UNITS <ArrowUpRight size={15} /></figcaption></figure>
+          <figure className="gallery-tile"><MediaImage src={detailImage?.imageUrl || PLACEHOLDER_IMAGE} alt={detailImage?.imageAlt || "Warmly lit residence interior"} /><figcaption>THE DETAILS <ArrowUpRight size={15} /></figcaption></figure>
+          <figure className="gallery-tile gallery-tile--wide"><MediaImage src={hero?.imageUrl || PLACEHOLDER_IMAGE} alt={hero?.imageAlt || "Le Grande resort-style exterior"} /><figcaption>THE EXPERIENCE <ArrowUpRight size={15} /></figcaption></figure>
         </div>
       </div>
     </section>
@@ -316,12 +307,15 @@ function Location() {
 }
 
 export default function Home() {
+  const { data: media = [] } = trpc.media.published.useQuery();
+  const hero = coverFor(media, "hero");
+  const welcome = coverFor(media, "property-gallery") || hero;
   return (
     <div className="site-shell">
       <Header />
       <main>
         <section className="hero">
-          <img className="hero__image" src={images.hero} alt="Tropical resort exterior at dusk" />
+          <MediaImage className="hero__image" src={hero?.imageUrl || PLACEHOLDER_IMAGE} alt={hero?.imageAlt || "Tropical resort exterior at dusk"} />
           <div className="hero__overlay" />
           <div className="hero__grain" />
           <div className="container hero__content">
@@ -348,19 +342,19 @@ export default function Home() {
               <div className="welcome__signature"><span>LG</span><div><strong>Made for moments</strong><small>Your private escape in paradise</small></div></div>
               <a className="text-link" href="#units">Discover the residences <ArrowUpRight size={16} /></a>
             </div>
-            <div className="welcome__media"><img src={images.welcome} alt="Tropical pool and garden at Le Grande" /><span className="image-caption">The art of doing less</span></div>
+            <div className="welcome__media"><MediaImage src={welcome?.imageUrl || PLACEHOLDER_IMAGE} alt={welcome?.imageAlt || "Tropical pool and garden at Le Grande"} /><span className="image-caption">The art of doing less</span></div>
           </div>
         </section>
 
         <section className="units section-teal" id="units">
           <div className="container">
             <div className="units__header"><SectionIntro eyebrow="Our accommodations" title="Choose your perfect stay" light /><span className="units__count">04<br /><small>residences</small></span></div>
-            <div className="unit-grid">{units.map((unit) => <UnitCard unit={unit} key={unit.id} />)}</div>
+            <div className="unit-grid">{units.map((unit) => <UnitCard unit={unit} media={media} key={unit.id} />)}</div>
           </div>
         </section>
 
         <Amenities />
-        <Gallery />
+        <Gallery media={media} />
         <Location />
 
         <section className="cta section-teal">
@@ -381,20 +375,23 @@ export default function Home() {
 export function UnitDetail() {
   const params = useParams<{ id: string }>();
   const unit = useMemo(() => units.find((item) => item.id === params.id) ?? units[0], [params.id]);
-  const [activeImage, setActiveImage] = useState(unit.image);
+  const { data: media = [] } = trpc.media.published.useQuery();
+  const unitMedia = mediaFor(media, "unit", unit.id);
+  const primary = coverFor(media, "unit", unit.id) || coverFor(media, "hero");
+  const [activeImage, setActiveImage] = useState(primary?.imageUrl || PLACEHOLDER_IMAGE);
   const [guestCount, setGuestCount] = useState(2);
 
-  useEffect(() => setActiveImage(unit.image), [unit.image]);
+  useEffect(() => setActiveImage(primary?.imageUrl || PLACEHOLDER_IMAGE), [primary?.imageUrl]);
 
   const amenityList = ["Wi-Fi", "Air conditioning", "Private bathroom", "TV", "Refrigerator", "Hot shower", "Linens", "Towels", "Hair dryer"];
-  const galleryImages = [unit.image, images.detail2, images.detail3];
+  const galleryImages = [primary, ...unitMedia.filter((item) => item.id !== primary?.id)].filter((item): item is PublicMedia => Boolean(item)).slice(0, 3);
 
   return (
     <div className="site-shell detail-page">
       <Header />
       <main>
         <section className="detail-hero section-ivory">
-          <div className="container"><Link className="back-link" href="/#units"><ArrowLeft size={15} /> Back to residences</Link><div className="detail-hero__grid"><div className="detail-gallery"><div className="detail-gallery__main"><img src={activeImage} alt={unit.name} /></div><div className="detail-gallery__thumbs">{galleryImages.map((image, index) => <button type="button" key={image} className={activeImage === image ? "is-active" : ""} onClick={() => setActiveImage(image)}><img src={image} alt={`${unit.name} view ${index + 1}`} /></button>)}</div></div><div className="detail-copy"><p className="eyebrow"><span />Unit {unit.number}</p><h1>{unit.name}</h1><p className="detail-copy__lead">{unit.description} A private, considered base for the days you want to remember.</p><div className="detail-stats"><span><Users size={16} /> {unit.guests}</span><span><BedDouble size={16} /> {unit.beds}</span><span><Droplets size={16} /> {unit.bath}</span><span><span className="size-icon">m²</span> {unit.size}</span></div><div className="detail-price"><span>Starting from</span><strong>₱XXXX <small>/ night</small></strong></div><a className="button button--dark" href="#detail-booking">Book this unit <ArrowUpRight size={16} /></a></div></div></div>
+          <div className="container"><Link className="back-link" href="/#units"><ArrowLeft size={15} /> Back to residences</Link><div className="detail-hero__grid"><div className="detail-gallery"><div className="detail-gallery__main"><MediaImage src={activeImage} alt={unit.name} /></div><div className="detail-gallery__thumbs">{galleryImages.map((image, index) => <button type="button" key={image.id} className={activeImage === image.imageUrl ? "is-active" : ""} onClick={() => setActiveImage(image.imageUrl)}><MediaImage src={image.imageUrl} alt={`${unit.name} view ${index + 1}`} /></button>)}</div></div><div className="detail-copy"><p className="eyebrow"><span />Unit {unit.number}</p><h1>{unit.name}</h1><p className="detail-copy__lead">{unit.description} A private, considered base for the days you want to remember.</p><div className="detail-stats"><span><Users size={16} /> {unit.guests}</span><span><BedDouble size={16} /> {unit.beds}</span><span><Droplets size={16} /> {unit.bath}</span><span><span className="size-icon">m²</span> {unit.size}</span></div><div className="detail-price"><span>Starting from</span><strong>₱XXXX <small>/ night</small></strong></div><a className="button button--dark" href="#detail-booking">Book this unit <ArrowUpRight size={16} /></a></div></div></div>
         </section>
         <section className="detail-information section-light"><div className="container detail-information__grid"><div><SectionIntro eyebrow="A considered stay" title="Everything in its place" copy="Thoughtfully prepared for restful nights, slow mornings, and the freedom to make the space your own." /><div className="amenity-list">{amenityList.map((item) => <span key={item}><Check size={15} /> {item}</span>)}</div></div><div className="detail-booking-card" id="detail-booking"><div className="detail-booking-card__top"><span>Availability on request</span><span className="status-dot" /></div><h3>Plan your stay</h3><p>Choose your dates and we will confirm availability with a host.</p><label>Check-in<input type="date" /></label><label>Check-out<input type="date" /></label><div className="guest-stepper"><span>Guests</span><div><button type="button" onClick={() => setGuestCount(Math.max(1, guestCount - 1))} aria-label="Remove guest"><Minus size={15} /></button><strong>{guestCount}</strong><button type="button" onClick={() => setGuestCount(Math.min(8, guestCount + 1))} aria-label="Add guest"><Plus size={15} /></button></div></div><button className="button button--gold" type="button" onClick={() => toast.success("Enquiry started", { description: `We will check Unit ${unit.number} for your dates.` })}>Check availability <ArrowUpRight size={16} /></button><small className="detail-booking-card__note">No payment is required to enquire.</small></div></div></section>
         <section className="detail-quote section-teal"><div className="container"><p>“</p><blockquote>Space to breathe, room to reconnect,<br />and a softer way to stay.</blockquote><span>— Le Grande</span></div></section>
