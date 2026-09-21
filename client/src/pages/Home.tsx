@@ -45,7 +45,7 @@ export const units: Unit[] = [
   {
     id: "residence-i",
     number: "01",
-    name: "Le Grande Residence I",
+    name: "Le Grand Homestay Residence I",
     description: "A composed retreat for slow mornings, soft light, and private time together.",
     guests: "2 guests",
     beds: "1 king bed",
@@ -56,7 +56,7 @@ export const units: Unit[] = [
   {
     id: "residence-ii",
     number: "02",
-    name: "Le Grande Residence II",
+    name: "Le Grand Homestay Residence II",
     description: "An airy, generous space for families and friends to settle into the island rhythm.",
     guests: "4 guests",
     beds: "2 beds",
@@ -67,7 +67,7 @@ export const units: Unit[] = [
   {
     id: "residence-iii",
     number: "03",
-    name: "Le Grande Residence III",
+    name: "Le Grand Homestay Residence III",
     description: "Warm timber, considered details, and an easy sense of room to breathe.",
     guests: "4 guests",
     beds: "2 beds",
@@ -78,7 +78,7 @@ export const units: Unit[] = [
   {
     id: "residence-iv",
     number: "04",
-    name: "Le Grande Residence IV",
+    name: "Le Grand Homestay Residence IV",
     description: "A refined home base for unhurried days, restful nights, and shared escapes.",
     guests: "3 guests",
     beds: "2 beds",
@@ -98,9 +98,9 @@ const navItems = [
 
 function Wordmark({ dark = false }: { dark?: boolean }) {
   return (
-    <a href="/" className={`wordmark ${dark ? "wordmark--dark" : ""}`} aria-label="Le Grande home">
+    <a href="/" className={`wordmark ${dark ? "wordmark--dark" : ""}`} aria-label="Le Grand Homestay home">
       <span className="wordmark__mark">LG</span>
-      <span className="wordmark__name">LE GRANDE</span>
+      <span className="wordmark__name">LE GRAND HOMESTAY</span>
     </a>
   );
 }
@@ -159,7 +159,7 @@ function BookingBar({ preselectedUnit = "" }: { preselectedUnit?: string }) {
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
     toast.success("Your enquiry is ready to send.", {
-      description: "A Le Grande host will confirm dates and details with you shortly.",
+      description: "A Le Grand Homestay host will confirm dates and details with you shortly.",
     });
   };
 
@@ -208,7 +208,7 @@ function UnitCard({ unit, media }: { unit: Unit; media: PublicMedia[] }) {
   return (
     <article className="unit-card">
       <div className="unit-card__media">
-        <MediaImage src={cover?.imageUrl || PLACEHOLDER_IMAGE} alt={cover?.imageAlt || `${unit.name} at Le Grande`} />
+        <MediaImage src={cover?.imageUrl || PLACEHOLDER_IMAGE} alt={cover?.imageAlt || `${unit.name} at Le Grand Homestay`} />
         <div className="unit-card__veil" />
         <span className="unit-card__number">UNIT {unit.number}</span>
         <button className={`save-button ${saved ? "save-button--saved" : ""}`} type="button" aria-label="Save unit" onClick={() => setSaved(!saved)}>
@@ -247,7 +247,7 @@ function Amenities() {
   return (
     <section className="amenities section-light" id="amenities">
       <div className="container">
-        <SectionIntro eyebrow="The Le Grande standard" title="Everything you need for a beautiful stay" copy="The essentials are considered, the atmosphere is unhurried, and the details are there when you need them." />
+        <SectionIntro eyebrow="The Le Grand Homestay standard" title="Everything you need for a beautiful stay" copy="The essentials are considered, the atmosphere is unhurried, and the details are there when you need them." />
         <div className="amenity-grid">
           {items.map(([number, title, copy, icon]) => (
             <div className="amenity-item" key={String(number)}>
@@ -277,10 +277,10 @@ function Gallery({ media }: { media: PublicMedia[] }) {
           <p>Light, texture, and the little moments that make a stay feel like your own.</p>
         </div>
         <div className="gallery-grid">
-          <figure className="gallery-tile gallery-tile--large"><MediaImage src={propertyImage?.imageUrl || PLACEHOLDER_IMAGE} alt={propertyImage?.imageAlt || "Le Grande pool and tropical landscape"} /><figcaption>THE PROPERTY <ArrowUpRight size={15} /></figcaption></figure>
+          <figure className="gallery-tile gallery-tile--large"><MediaImage src={propertyImage?.imageUrl || PLACEHOLDER_IMAGE} alt={propertyImage?.imageAlt || "Le Grand Homestay pool and tropical landscape"} /><figcaption>THE PROPERTY <ArrowUpRight size={15} /></figcaption></figure>
           <figure className="gallery-tile"><MediaImage src={unitsImage?.imageUrl || PLACEHOLDER_IMAGE} alt={unitsImage?.imageAlt || "Quiet bedroom interior"} /><figcaption>THE UNITS <ArrowUpRight size={15} /></figcaption></figure>
           <figure className="gallery-tile"><MediaImage src={detailImage?.imageUrl || PLACEHOLDER_IMAGE} alt={detailImage?.imageAlt || "Warmly lit residence interior"} /><figcaption>THE DETAILS <ArrowUpRight size={15} /></figcaption></figure>
-          <figure className="gallery-tile gallery-tile--wide"><MediaImage src={hero?.imageUrl || PLACEHOLDER_IMAGE} alt={hero?.imageAlt || "Le Grande resort-style exterior"} /><figcaption>THE EXPERIENCE <ArrowUpRight size={15} /></figcaption></figure>
+          <figure className="gallery-tile gallery-tile--wide"><MediaImage src={hero?.imageUrl || PLACEHOLDER_IMAGE} alt={hero?.imageAlt || "Le Grand Homestay resort-style exterior"} /><figcaption>THE EXPERIENCE <ArrowUpRight size={15} /></figcaption></figure>
         </div>
       </div>
     </section>
@@ -292,13 +292,13 @@ function Location() {
     <section className="location section-light" id="location">
       <div className="container location__grid">
         <div className="location__copy">
-          <SectionIntro eyebrow="A softer kind of arrival" title="Your escape starts here" copy="We are preparing the final location details for Le Grande. Once confirmed, this is where you will find the address, directions, nearby places, and the easiest way to arrive." />
+          <SectionIntro eyebrow="A softer kind of arrival" title="Your escape starts here" copy="We are preparing the final location details for Le Grand Homestay. Once confirmed, this is where you will find the address, directions, nearby places, and the easiest way to arrive." />
           <div className="placeholder-note"><Clock3 size={17} /><span>Exact location, nearby attractions, and travel times will be added when supplied.</span></div>
           <a className="text-link" href="#contact">Request directions <ArrowUpRight size={16} /></a>
         </div>
         <div className="map-placeholder">
           <div className="map-placeholder__grid" />
-          <div className="map-placeholder__pin"><MinusCircle size={40} strokeWidth={1} /><span>LE GRANDE</span></div>
+          <div className="map-placeholder__pin"><MinusCircle size={40} strokeWidth={1} /><span>LE GRAND HOMESTAY</span></div>
           <span className="map-placeholder__label">Location details coming soon</span>
         </div>
       </div>
@@ -320,7 +320,7 @@ export default function Home() {
           <div className="hero__grain" />
           <div className="container hero__content">
             <p className="hero__eyebrow">Stay · relax · experience</p>
-            <h1>Le Grande</h1>
+            <h1>Le Grand Homestay</h1>
             <div className="hero__rule" />
             <p className="hero__tagline">Your private escape<br />in paradise.</p>
             <p className="hero__copy">An elegant stay designed for comfort, relaxation, and unforgettable moments.</p>
@@ -338,11 +338,11 @@ export default function Home() {
         <section className="welcome section-ivory" id="welcome">
           <div className="container welcome__grid">
             <div className="welcome__copy">
-              <SectionIntro eyebrow="Welcome to Le Grande" title="Where comfort meets the art of escape" copy="Discover a refined stay designed for guests who appreciate comfort, privacy, and effortless relaxation. Le Grande offers four thoughtfully prepared accommodation units, giving you a beautiful place to rest, reconnect, and enjoy your getaway." />
+              <SectionIntro eyebrow="Welcome to Le Grand Homestay" title="Where comfort meets the art of escape" copy="Discover a refined stay designed for guests who appreciate comfort, privacy, and effortless relaxation. Le Grand Homestay offers four thoughtfully prepared accommodation units, giving you a beautiful place to rest, reconnect, and enjoy your getaway." />
               <div className="welcome__signature"><span>LG</span><div><strong>Made for moments</strong><small>Your private escape in paradise</small></div></div>
               <a className="text-link" href="#units">Discover the residences <ArrowUpRight size={16} /></a>
             </div>
-            <div className="welcome__media"><MediaImage src={welcome?.imageUrl || PLACEHOLDER_IMAGE} alt={welcome?.imageAlt || "Tropical pool and garden at Le Grande"} /><span className="image-caption">The art of doing less</span></div>
+            <div className="welcome__media"><MediaImage src={welcome?.imageUrl || PLACEHOLDER_IMAGE} alt={welcome?.imageAlt || "Tropical pool and garden at Le Grand Homestay"} /><span className="image-caption">The art of doing less</span></div>
           </div>
         </section>
 
@@ -360,7 +360,7 @@ export default function Home() {
         <section className="cta section-teal">
           <div className="cta__halo" />
           <div className="container cta__content">
-            <p className="eyebrow eyebrow--gold"><span />Le Grande</p>
+            <p className="eyebrow eyebrow--gold"><span />Le Grand Homestay</p>
             <h2>Make your next escape<br /><em>extraordinary.</em></h2>
             <p>Four beautiful spaces. One unforgettable destination.</p>
             <a className="button button--gold" href="#booking">Book your stay <ArrowUpRight size={16} /></a>
@@ -394,7 +394,7 @@ export function UnitDetail() {
           <div className="container"><Link className="back-link" href="/#units"><ArrowLeft size={15} /> Back to residences</Link><div className="detail-hero__grid"><div className="detail-gallery"><div className="detail-gallery__main"><MediaImage src={activeImage} alt={unit.name} /></div><div className="detail-gallery__thumbs">{galleryImages.map((image, index) => <button type="button" key={image.id} className={activeImage === image.imageUrl ? "is-active" : ""} onClick={() => setActiveImage(image.imageUrl)}><MediaImage src={image.imageUrl} alt={`${unit.name} view ${index + 1}`} /></button>)}</div></div><div className="detail-copy"><p className="eyebrow"><span />Unit {unit.number}</p><h1>{unit.name}</h1><p className="detail-copy__lead">{unit.description} A private, considered base for the days you want to remember.</p><div className="detail-stats"><span><Users size={16} /> {unit.guests}</span><span><BedDouble size={16} /> {unit.beds}</span><span><Droplets size={16} /> {unit.bath}</span><span><span className="size-icon">m²</span> {unit.size}</span></div><div className="detail-price"><span>Starting from</span><strong>₱XXXX <small>/ night</small></strong></div><a className="button button--dark" href="#detail-booking">Book this unit <ArrowUpRight size={16} /></a></div></div></div>
         </section>
         <section className="detail-information section-light"><div className="container detail-information__grid"><div><SectionIntro eyebrow="A considered stay" title="Everything in its place" copy="Thoughtfully prepared for restful nights, slow mornings, and the freedom to make the space your own." /><div className="amenity-list">{amenityList.map((item) => <span key={item}><Check size={15} /> {item}</span>)}</div></div><div className="detail-booking-card" id="detail-booking"><div className="detail-booking-card__top"><span>Availability on request</span><span className="status-dot" /></div><h3>Plan your stay</h3><p>Choose your dates and we will confirm availability with a host.</p><label>Check-in<input type="date" /></label><label>Check-out<input type="date" /></label><div className="guest-stepper"><span>Guests</span><div><button type="button" onClick={() => setGuestCount(Math.max(1, guestCount - 1))} aria-label="Remove guest"><Minus size={15} /></button><strong>{guestCount}</strong><button type="button" onClick={() => setGuestCount(Math.min(8, guestCount + 1))} aria-label="Add guest"><Plus size={15} /></button></div></div><button className="button button--gold" type="button" onClick={() => toast.success("Enquiry started", { description: `We will check Unit ${unit.number} for your dates.` })}>Check availability <ArrowUpRight size={16} /></button><small className="detail-booking-card__note">No payment is required to enquire.</small></div></div></section>
-        <section className="detail-quote section-teal"><div className="container"><p>“</p><blockquote>Space to breathe, room to reconnect,<br />and a softer way to stay.</blockquote><span>— Le Grande</span></div></section>
+        <section className="detail-quote section-teal"><div className="container"><p>“</p><blockquote>Space to breathe, room to reconnect,<br />and a softer way to stay.</blockquote><span>— Le Grand Homestay</span></div></section>
       </main>
       <Footer />
     </div>
@@ -404,7 +404,7 @@ export function UnitDetail() {
 function Footer() {
   return (
     <footer className="footer" id="contact">
-      <div className="container footer__top"><div className="footer__brand"><Wordmark /><p>Your private escape in paradise.</p><div className="footer__social"><a href="#contact" aria-label="Instagram"><Instagram size={17} /></a><a href="#contact" aria-label="Facebook"><Facebook size={17} /></a></div></div><div className="footer__column"><span>Explore</span><a href="/#welcome">Welcome</a><a href="/#units">The units</a><a href="/#amenities">Amenities</a><a href="/#gallery">Gallery</a></div><div className="footer__column"><span>Plan your stay</span><a href="/#booking">Check availability</a><a href="/#booking">Book now</a><a href="/#location">Location</a><a href="mailto:hello@legrande.example">Email us</a></div><div className="footer__column footer__column--contact"><span>Contact</span><p>Phone details<br />coming soon</p><p>Address details<br />coming soon</p></div></div><div className="container footer__bottom"><span>© {new Date().getFullYear()} Le Grande. All rights reserved.</span><span>Designed for the art of escape.</span></div>
+      <div className="container footer__top"><div className="footer__brand"><Wordmark /><p>Your private escape in paradise.</p><div className="footer__social"><a href="#contact" aria-label="Instagram"><Instagram size={17} /></a><a href="#contact" aria-label="Facebook"><Facebook size={17} /></a></div></div><div className="footer__column"><span>Explore</span><a href="/#welcome">Welcome</a><a href="/#units">The units</a><a href="/#amenities">Amenities</a><a href="/#gallery">Gallery</a></div><div className="footer__column"><span>Plan your stay</span><a href="/#booking">Check availability</a><a href="/#booking">Book now</a><a href="/#location">Location</a><a href="mailto:hello@legrande.example">Email us</a></div><div className="footer__column footer__column--contact"><span>Contact</span><p>Phone details<br />coming soon</p><p>Address details<br />coming soon</p></div></div><div className="container footer__bottom"><span>© {new Date().getFullYear()} Le Grand Homestay. All rights reserved.</span><span>Designed for the art of escape.</span></div>
     </footer>
   );
 }

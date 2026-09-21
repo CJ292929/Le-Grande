@@ -151,14 +151,14 @@ function MediaAdminShell() {
   };
 
   if (user?.role !== "admin") {
-    return <div className="admin-forbidden"><ShieldCheck size={34} /><h1>Owner access only</h1><p>This workspace is reserved for authorized Le Grande owners and administrators.</p></div>;
+    return <div className="admin-forbidden"><ShieldCheck size={34} /><h1>Owner access only</h1><p>This workspace is reserved for authorized Le Grand Homestay owners and administrators.</p></div>;
   }
 
   return (
     <div className="media-admin">
       <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp" multiple className="sr-only" onChange={onFiles} />
       <header className="media-admin__header">
-        <div><p className="admin-kicker"><span /> Le Grande owner studio</p><h1>Media / Photos</h1><p className="admin-lead">Replace, organize, and publish the photography that shapes your guest experience.</p></div>
+        <div><p className="admin-kicker"><span /> Le Grand Homestay owner studio</p><h1>Media / Photos</h1><p className="admin-lead">Replace, organize, and publish the photography that shapes your guest experience.</p></div>
         <div className="media-admin__header-actions"><span className="live-badge"><CheckCircle2 size={15} /> Live updates on</span><button className="admin-outline-button" type="button" onClick={() => { toast.success("All edits are already live."); refresh(); }}><RefreshCw size={15} /> Save changes</button></div>
       </header>
       <div className="demo-banner"><FileImage size={18} /><div><strong>Demo images are active</strong><span>These are clearly marked sample photos. Replace them with your own property photography at any time.</span></div><button type="button" onClick={() => toast("Choose any image card below and select Replace.")}><ChevronRight size={18} /></button></div>
