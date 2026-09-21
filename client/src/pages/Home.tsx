@@ -19,6 +19,7 @@ import {
   Menu,
   Minus,
   MinusCircle,
+  MapPin,
   Plus,
   Search,
   ShieldCheck,
@@ -292,14 +293,14 @@ function Location() {
     <section className="location section-light" id="location">
       <div className="container location__grid">
         <div className="location__copy">
-          <SectionIntro eyebrow="A softer kind of arrival" title="Your escape starts here" copy="We are preparing the final location details for Le Grand Homestay. Once confirmed, this is where you will find the address, directions, nearby places, and the easiest way to arrive." />
-          <div className="placeholder-note"><Clock3 size={17} /><span>Exact location, nearby attractions, and travel times will be added when supplied.</span></div>
-          <a className="text-link" href="#contact">Request directions <ArrowUpRight size={16} /></a>
+          <SectionIntro eyebrow="A softer kind of arrival" title="Your escape starts here" copy="Find Le Grand Homestay at Arella Residences, a calm and convenient base in Bay, Laguna. Save the address below for an easier arrival." />
+          <div className="placeholder-note"><MapPin size={17} /><span>Arella Residences, Pan-Philippine Highway, Brgy. Calo, Bay, Laguna 4033, Philippines</span></div>
+          <a className="text-link" href="https://www.google.com/maps/search/?api=1&query=Arella%20Residences%2C%20Pan-Philippine%20Highway%2C%20Brgy.%20Calo%2C%20Bay%2C%20Laguna%204033%2C%20Philippines" target="_blank" rel="noreferrer">Request directions <ArrowUpRight size={16} /></a>
         </div>
         <div className="map-placeholder">
           <div className="map-placeholder__grid" />
           <div className="map-placeholder__pin"><MinusCircle size={40} strokeWidth={1} /><span>LE GRAND HOMESTAY</span></div>
-          <span className="map-placeholder__label">Location details coming soon</span>
+          <span className="map-placeholder__label">Arella Residences · Bay, Laguna</span>
         </div>
       </div>
     </section>
@@ -404,7 +405,7 @@ export function UnitDetail() {
 function Footer() {
   return (
     <footer className="footer" id="contact">
-      <div className="container footer__top"><div className="footer__brand"><Wordmark /><p>Your private escape in paradise.</p><div className="footer__social"><a href="#contact" aria-label="Instagram"><Instagram size={17} /></a><a href="#contact" aria-label="Facebook"><Facebook size={17} /></a></div></div><div className="footer__column"><span>Explore</span><a href="/#welcome">Welcome</a><a href="/#units">The units</a><a href="/#amenities">Amenities</a><a href="/#gallery">Gallery</a></div><div className="footer__column"><span>Plan your stay</span><a href="/#booking">Check availability</a><a href="/#booking">Book now</a><a href="/#location">Location</a><a href="mailto:hello@legrande.example">Email us</a></div><div className="footer__column footer__column--contact"><span>Contact</span><p>Phone details<br />coming soon</p><p>Address details<br />coming soon</p></div></div><div className="container footer__bottom"><span>© {new Date().getFullYear()} Le Grand Homestay. All rights reserved.</span><span>Designed for the art of escape.</span></div>
+      <div className="container footer__top"><div className="footer__brand"><Wordmark /><p>Your private escape in paradise.</p><div className="footer__social"><a href="#contact" aria-label="Instagram"><Instagram size={17} /></a><a href="#contact" aria-label="Facebook"><Facebook size={17} /></a></div></div><div className="footer__column"><span>Explore</span><a href="/#welcome">Welcome</a><a href="/#units">The units</a><a href="/#amenities">Amenities</a><a href="/#gallery">Gallery</a></div><div className="footer__column"><span>Plan your stay</span><a href="/#booking">Check availability</a><a href="/#booking">Book now</a><a href="/#location">Location</a><a href="mailto:hello@legrande.example">Email us</a></div><div className="footer__column footer__column--contact"><span>Contact</span><p>Arella Residences<br />Bay, Laguna</p><p>Pan-Philippine Highway<br />Brgy. Calo, Laguna 4033</p></div></div><div className="container footer__bottom"><span>© {new Date().getFullYear()} Le Grand Homestay. All rights reserved.</span><span>Arella Residences · Bay, Laguna</span></div>
     </footer>
   );
 }
