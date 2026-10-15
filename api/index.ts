@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "http";
-import { createApp } from "../server/_core/app";
+import { createApp } from "../server/_core/app.js";
 
 // Built once per function instance and reused across invocations. Must never
 // call listen() or pull in dev-only Vite tooling — this module is the

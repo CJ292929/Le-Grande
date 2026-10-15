@@ -1,6 +1,6 @@
 import "dotenv/config";
 import express, { type Express, type NextFunction, type Request, type Response } from "express";
-import { handleBookingRequest } from "../booking";
+import { handleBookingRequest } from "../booking.js";
 
 const BOOKING_BODY_LIMIT_BYTES = 10 * 1024;
 

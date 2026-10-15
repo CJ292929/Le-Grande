@@ -11,7 +11,7 @@
  * intentionally does not enforce a per-unit guest maximum.
  */
 import { z } from "zod";
-import { units } from "./units";
+import { units } from "./units.js";
 
 const UNIT_IDS = units.map((unit) => unit.id) as [string, ...string[]];
 

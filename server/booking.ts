@@ -12,8 +12,8 @@ import {
   bookingRequestSchema,
   stripHoneypot,
   type BookingRequestPayload,
-} from "../shared/booking";
-import { ENV } from "./_core/env";
+} from "../shared/booking.js";
+import { ENV } from "./_core/env.js";
 
 const UPSTREAM_TIMEOUT_MS = Number(process.env.BOOKING_UPSTREAM_TIMEOUT_MS) || 8_000;
 
