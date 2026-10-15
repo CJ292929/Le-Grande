@@ -333,6 +333,7 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 500; line-height: .95; }
   .detail-information__grid > .detail-booking-card { margin-top: 62px; }
 }
 @media (max-width: 420px) {
+  .hero__video-toggle { top: 90px; right: 20px; bottom: auto; left: auto; }
   .hero__actions { align-items: stretch; flex-direction: column; max-width: 230px; }
   .hero__actions .button { width: 100%; }
   .unit-card__body { padding: 24px 19px 22px; }
