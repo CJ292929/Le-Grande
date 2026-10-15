@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "wouter";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
-import { coverFor, mediaFor, MediaImage, PLACEHOLDER_IMAGE, type PublicMedia } from "@/lib/media";
+import { coverFor, mediaFor, MediaImage, PLACEHOLDER_IMAGE, STATIC_MEDIA, type PublicMedia } from "@/lib/media";
 import {
   ArrowDownRight,
   ArrowLeft,
@@ -308,7 +308,8 @@ function Location() {
 }
 
 export default function Home() {
-  const { data: media = [] } = trpc.media.published.useQuery();
+  const { data: mediaFromDb = [] } = trpc.media.published.useQuery();
+  const media = mediaFromDb.length ? mediaFromDb : STATIC_MEDIA;
   const hero = coverFor(media, "hero");
   const welcome = coverFor(media, "property-gallery") || hero;
   return (
@@ -376,7 +377,8 @@ export default function Home() {
 export function UnitDetail() {
   const params = useParams<{ id: string }>();
   const unit = useMemo(() => units.find((item) => item.id === params.id) ?? units[0], [params.id]);
-  const { data: media = [] } = trpc.media.published.useQuery();
+  const { data: mediaFromDb = [] } = trpc.media.published.useQuery();
+  const media = mediaFromDb.length ? mediaFromDb : STATIC_MEDIA;
   const unitMedia = mediaFor(media, "unit", unit.id);
   const primary = coverFor(media, "unit", unit.id) || coverFor(media, "hero");
   const [activeImage, setActiveImage] = useState(primary?.imageUrl || PLACEHOLDER_IMAGE);
