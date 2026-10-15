@@ -1,26 +1,22 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "wouter";
-import { toast } from "sonner";
-import { trpc } from "@/lib/trpc";
-import { coverFor, mediaFor, MediaImage, PLACEHOLDER_IMAGE, STATIC_MEDIA, type PublicMedia } from "@/lib/media";
+import { units, type Unit } from "@shared/units";
+import { cardSrcSet, coverFor, mediaFor, MediaImage, PLACEHOLDER_IMAGE, STATIC_MEDIA, variantUrl, VARIANT_SIZE, type PublicMedia } from "@/lib/media";
+import BookingForm from "@/components/BookingForm";
 import {
   ArrowDownRight,
   ArrowLeft,
   ArrowUpRight,
   BedDouble,
-  CalendarDays,
   Check,
-  ChevronDown,
   Clock3,
   Coffee,
   Droplets,
   Facebook,
   Instagram,
   Menu,
-  Minus,
   MinusCircle,
   MapPin,
-  Plus,
   Search,
   ShieldCheck,
   Sparkles,
@@ -29,65 +25,6 @@ import {
   Wifi,
   X,
 } from "lucide-react";
-
-type Unit = {
-  id: string;
-  number: string;
-  name: string;
-  description: string;
-  guests: string;
-  beds: string;
-  bath: string;
-  size: string;
-  availability: string;
-};
-
-export const units: Unit[] = [
-  {
-    id: "residence-i",
-    number: "01",
-    name: "Le Grand Homestay Residence I",
-    description: "A composed retreat for slow mornings, soft light, and private time together.",
-    guests: "2 guests",
-    beds: "1 king bed",
-    bath: "1 bath",
-    size: "45 m²",
-    availability: "Availability on request",
-  },
-  {
-    id: "residence-ii",
-    number: "02",
-    name: "Le Grand Homestay Residence II",
-    description: "An airy, generous space for families and friends to settle into the island rhythm.",
-    guests: "4 guests",
-    beds: "2 beds",
-    bath: "1 bath",
-    size: "58 m²",
-    availability: "Availability on request",
-  },
-  {
-    id: "residence-iii",
-    number: "03",
-    name: "Le Grand Homestay Residence III",
-    description: "Warm timber, considered details, and an easy sense of room to breathe.",
-    guests: "4 guests",
-    beds: "2 beds",
-    bath: "1 bath",
-    size: "62 m²",
-    availability: "Availability on request",
-  },
-  {
-    id: "residence-iv",
-    number: "04",
-    name: "Le Grand Homestay Residence IV",
-    description: "A refined home base for unhurried days, restful nights, and shared escapes.",
-    guests: "3 guests",
-    beds: "2 beds",
-    bath: "1 bath",
-    size: "52 m²",
-    availability: "Availability on request",
-  },
-];
 
 const navItems = [
   ["The units", "#units"],
@@ -152,54 +89,13 @@ function SectionIntro({ eyebrow, title, copy, light = false }: { eyebrow: string
 }
 
 function BookingBar({ preselectedUnit = "" }: { preselectedUnit?: string }) {
-  const [unit, setUnit] = useState(preselectedUnit);
-  const [guests, setGuests] = useState("2 guests");
-
-  useEffect(() => setUnit(preselectedUnit), [preselectedUnit]);
-
-  const submit = (event: React.FormEvent) => {
-    event.preventDefault();
-    toast.success("Your enquiry is ready to send.", {
-      description: "A Le Grand Homestay host will confirm dates and details with you shortly.",
-    });
-  };
-
   return (
-    <form className="booking-bar" id="booking" onSubmit={submit}>
-      <div className="booking-bar__intro">
-        <span className="booking-bar__kicker">Begin your stay</span>
-        <strong>Plan your escape</strong>
-      </div>
-      <label className="booking-field">
-        <span><CalendarDays size={15} /> Check-in</span>
-        <input type="date" aria-label="Check-in date" />
-      </label>
-      <label className="booking-field">
-        <span><CalendarDays size={15} /> Check-out</span>
-        <input type="date" aria-label="Check-out date" />
-      </label>
-      <label className="booking-field booking-field--select">
-        <span><Users size={15} /> Guests</span>
-        <select value={guests} onChange={(event) => setGuests(event.target.value)} aria-label="Number of guests">
-          <option>2 guests</option>
-          <option>3 guests</option>
-          <option>4 guests</option>
-          <option>5 guests</option>
-        </select>
-        <ChevronDown size={15} />
-      </label>
-      <label className="booking-field booking-field--select">
-        <span><Sparkles size={15} /> Select unit</span>
-        <select value={unit} onChange={(event) => setUnit(event.target.value)} aria-label="Select unit">
-          <option value="">Any residence</option>
-          {units.map((item) => <option key={item.id} value={item.id}>Unit {item.number}</option>)}
-        </select>
-        <ChevronDown size={15} />
-      </label>
-      <button className="button button--gold booking-bar__submit" type="submit">
-        Check availability <ArrowUpRight size={16} />
-      </button>
-    </form>
+    <BookingForm
+      id="booking"
+      variant="bar"
+      idPrefix="home-booking"
+      defaultUnitId={preselectedUnit || undefined}
+    />
   );
 }
 
@@ -209,7 +105,15 @@ function UnitCard({ unit, media }: { unit: Unit; media: PublicMedia[] }) {
   return (
     <article className="unit-card">
       <div className="unit-card__media">
-        <MediaImage src={cover?.imageUrl || PLACEHOLDER_IMAGE} alt={cover?.imageAlt || `${unit.name} at Le Grand Homestay`} />
+        <MediaImage
+          src={cover ? variantUrl(cover.imageUrl, "card") : PLACEHOLDER_IMAGE}
+          srcSet={cover ? cardSrcSet(cover.imageUrl) : undefined}
+          sizes="(max-width: 720px) 100vw, (max-width: 1080px) 50vw, 33vw"
+          width={VARIANT_SIZE.card.width}
+          height={VARIANT_SIZE.card.height}
+          loading="lazy"
+          alt={cover?.imageAlt || `${unit.name} at Le Grand Homestay`}
+        />
         <div className="unit-card__veil" />
         <span className="unit-card__number">UNIT {unit.number}</span>
         <button className={`save-button ${saved ? "save-button--saved" : ""}`} type="button" aria-label="Save unit" onClick={() => setSaved(!saved)}>
@@ -220,7 +124,7 @@ function UnitCard({ unit, media }: { unit: Unit; media: PublicMedia[] }) {
       <div className="unit-card__body">
         <div className="unit-card__heading">
           <h3>{unit.name}</h3>
-          <span className="unit-card__price">₱XXXX <small>/ night</small></span>
+          <span className="unit-card__price">Contact us for rates</span>
         </div>
         <p>{unit.description}</p>
         <div className="unit-card__facts">
@@ -264,24 +168,37 @@ function Amenities() {
   );
 }
 
+function GalleryTile({ item, className, caption }: { item?: PublicMedia; className: string; caption: string }) {
+  return (
+    <figure className={className}>
+      <MediaImage
+        src={item ? variantUrl(item.imageUrl, "card") : PLACEHOLDER_IMAGE}
+        srcSet={item ? cardSrcSet(item.imageUrl) : undefined}
+        sizes="(max-width: 720px) 100vw, (max-width: 1080px) 50vw, 25vw"
+        width={VARIANT_SIZE.card.width}
+        height={VARIANT_SIZE.card.height}
+        loading="lazy"
+        alt={item?.imageAlt || "Le Grand Homestay residence interior"}
+      />
+      <figcaption>{caption} <ArrowUpRight size={15} /></figcaption>
+    </figure>
+  );
+}
+
 function Gallery({ media }: { media: PublicMedia[] }) {
   const gallery = mediaFor(media, "property-gallery");
-  const hero = coverFor(media, "hero");
-  const propertyImage = gallery[0] || hero;
-  const unitsImage = gallery[1] || propertyImage;
-  const detailImage = gallery[2] || unitsImage;
   return (
     <section className="gallery section-ivory" id="gallery">
       <div className="container">
         <div className="gallery__topline">
           <SectionIntro eyebrow="A sense of place" title="The gallery" />
-          <p>Light, texture, and the little moments that make a stay feel like your own.</p>
+          <p>A look inside each of our four residences — real rooms, real light.</p>
         </div>
         <div className="gallery-grid">
-          <figure className="gallery-tile gallery-tile--large"><MediaImage src={propertyImage?.imageUrl || PLACEHOLDER_IMAGE} alt={propertyImage?.imageAlt || "Le Grand Homestay pool and tropical landscape"} /><figcaption>THE PROPERTY <ArrowUpRight size={15} /></figcaption></figure>
-          <figure className="gallery-tile"><MediaImage src={unitsImage?.imageUrl || PLACEHOLDER_IMAGE} alt={unitsImage?.imageAlt || "Quiet bedroom interior"} /><figcaption>THE UNITS <ArrowUpRight size={15} /></figcaption></figure>
-          <figure className="gallery-tile"><MediaImage src={detailImage?.imageUrl || PLACEHOLDER_IMAGE} alt={detailImage?.imageAlt || "Warmly lit residence interior"} /><figcaption>THE DETAILS <ArrowUpRight size={15} /></figcaption></figure>
-          <figure className="gallery-tile gallery-tile--wide"><MediaImage src={hero?.imageUrl || PLACEHOLDER_IMAGE} alt={hero?.imageAlt || "Le Grand Homestay resort-style exterior"} /><figcaption>THE EXPERIENCE <ArrowUpRight size={15} /></figcaption></figure>
+          <GalleryTile item={gallery[0]} className="gallery-tile gallery-tile--large" caption="RESIDENCE I" />
+          <GalleryTile item={gallery[1]} className="gallery-tile" caption="RESIDENCE II" />
+          <GalleryTile item={gallery[2]} className="gallery-tile" caption="RESIDENCE III" />
+          <GalleryTile item={gallery[3]} className="gallery-tile gallery-tile--wide" caption="RESIDENCE IV" />
         </div>
       </div>
     </section>
@@ -308,8 +225,7 @@ function Location() {
 }
 
 export default function Home() {
-  const { data: mediaFromDb = [] } = trpc.media.published.useQuery();
-  const media = mediaFromDb.length ? mediaFromDb : STATIC_MEDIA;
+  const media = STATIC_MEDIA;
   const hero = coverFor(media, "hero");
   const welcome = coverFor(media, "property-gallery") || hero;
   return (
@@ -317,7 +233,14 @@ export default function Home() {
       <Header />
       <main>
         <section className="hero">
-          <MediaImage className="hero__image" src={hero?.imageUrl || PLACEHOLDER_IMAGE} alt={hero?.imageAlt || "Tropical resort exterior at dusk"} />
+          <MediaImage
+            className="hero__image"
+            src={hero ? variantUrl(hero.imageUrl, "full") : PLACEHOLDER_IMAGE}
+            width={VARIANT_SIZE.full.width}
+            height={VARIANT_SIZE.full.height}
+            fetchPriority="high"
+            alt={hero?.imageAlt || "Le Grand Homestay residence interior"}
+          />
           <div className="hero__overlay" />
           <div className="hero__grain" />
           <div className="container hero__content">
@@ -344,7 +267,18 @@ export default function Home() {
               <div className="welcome__signature"><span>LG</span><div><strong>Made for moments</strong><small>Your private escape in paradise</small></div></div>
               <a className="text-link" href="#units">Discover the residences <ArrowUpRight size={16} /></a>
             </div>
-            <div className="welcome__media"><MediaImage src={welcome?.imageUrl || PLACEHOLDER_IMAGE} alt={welcome?.imageAlt || "Tropical pool and garden at Le Grand Homestay"} /><span className="image-caption">The art of doing less</span></div>
+            <div className="welcome__media">
+              <MediaImage
+                src={welcome ? variantUrl(welcome.imageUrl, "card") : PLACEHOLDER_IMAGE}
+                srcSet={welcome ? cardSrcSet(welcome.imageUrl) : undefined}
+                sizes="(max-width: 900px) 100vw, 45vw"
+                width={VARIANT_SIZE.card.width}
+                height={VARIANT_SIZE.card.height}
+                loading="lazy"
+                alt={welcome?.imageAlt || "Le Grand Homestay residence interior"}
+              />
+              <span className="image-caption">The art of doing less</span>
+            </div>
           </div>
         </section>
 
@@ -377,26 +311,32 @@ export default function Home() {
 export function UnitDetail() {
   const params = useParams<{ id: string }>();
   const unit = useMemo(() => units.find((item) => item.id === params.id) ?? units[0], [params.id]);
-  const { data: mediaFromDb = [] } = trpc.media.published.useQuery();
-  const media = mediaFromDb.length ? mediaFromDb : STATIC_MEDIA;
+  const media = STATIC_MEDIA;
   const unitMedia = mediaFor(media, "unit", unit.id);
   const primary = coverFor(media, "unit", unit.id) || coverFor(media, "hero");
   const [activeImage, setActiveImage] = useState(primary?.imageUrl || PLACEHOLDER_IMAGE);
-  const [guestCount, setGuestCount] = useState(2);
+  const [showAllPhotos, setShowAllPhotos] = useState(false);
 
-  useEffect(() => setActiveImage(primary?.imageUrl || PLACEHOLDER_IMAGE), [primary?.imageUrl]);
+  useEffect(() => {
+    setActiveImage(primary?.imageUrl || PLACEHOLDER_IMAGE);
+    setShowAllPhotos(false);
+  }, [primary?.imageUrl]);
 
   const amenityList = ["Wi-Fi", "Air conditioning", "Private bathroom", "TV", "Refrigerator", "Hot shower", "Linens", "Towels", "Hair dryer"];
-  const galleryImages = [primary, ...unitMedia.filter((item) => item.id !== primary?.id)].filter((item): item is PublicMedia => Boolean(item)).slice(0, 3);
+  const allGalleryImages = [primary, ...unitMedia.filter((item) => item.id !== primary?.id)].filter((item): item is PublicMedia => Boolean(item));
+  const visibleCount = 8;
+  const galleryImages = showAllPhotos ? allGalleryImages : allGalleryImages.slice(0, visibleCount);
+  const remainingPhotoCount = allGalleryImages.length - visibleCount;
+  const activeImageSrc = activeImage === PLACEHOLDER_IMAGE ? PLACEHOLDER_IMAGE : variantUrl(activeImage, "full");
 
   return (
     <div className="site-shell detail-page">
       <Header />
       <main>
         <section className="detail-hero section-ivory">
-          <div className="container"><Link className="back-link" href="/#units"><ArrowLeft size={15} /> Back to residences</Link><div className="detail-hero__grid"><div className="detail-gallery"><div className="detail-gallery__main"><MediaImage src={activeImage} alt={unit.name} /></div><div className="detail-gallery__thumbs">{galleryImages.map((image, index) => <button type="button" key={image.id} className={activeImage === image.imageUrl ? "is-active" : ""} onClick={() => setActiveImage(image.imageUrl)}><MediaImage src={image.imageUrl} alt={`${unit.name} view ${index + 1}`} /></button>)}</div></div><div className="detail-copy"><p className="eyebrow"><span />Unit {unit.number}</p><h1>{unit.name}</h1><p className="detail-copy__lead">{unit.description} A private, considered base for the days you want to remember.</p><div className="detail-stats"><span><Users size={16} /> {unit.guests}</span><span><BedDouble size={16} /> {unit.beds}</span><span><Droplets size={16} /> {unit.bath}</span><span><span className="size-icon">m²</span> {unit.size}</span></div><div className="detail-price"><span>Starting from</span><strong>₱XXXX <small>/ night</small></strong></div><a className="button button--dark" href="#detail-booking">Book this unit <ArrowUpRight size={16} /></a></div></div></div>
+          <div className="container"><Link className="back-link" href="/#units"><ArrowLeft size={15} /> Back to residences</Link><div className="detail-hero__grid"><div className="detail-gallery"><div className="detail-gallery__main"><MediaImage src={activeImageSrc} alt={unit.name} width={VARIANT_SIZE.full.width} height={VARIANT_SIZE.full.height} /></div><div className="detail-gallery__thumbs">{galleryImages.map((image, index) => <button type="button" key={image.id} className={activeImage === image.imageUrl ? "is-active" : ""} onClick={() => setActiveImage(image.imageUrl)}><MediaImage src={variantUrl(image.imageUrl, "thumb")} width={VARIANT_SIZE.thumb.width} height={VARIANT_SIZE.thumb.height} alt={image.imageAlt || `${unit.name} view ${index + 1}`} loading={index === 0 ? undefined : "lazy"} /></button>)}</div>{remainingPhotoCount > 0 && !showAllPhotos && <button type="button" className="text-link detail-gallery__view-all" onClick={() => setShowAllPhotos(true)}>View all {allGalleryImages.length} photos <ArrowUpRight size={16} /></button>}</div><div className="detail-copy"><p className="eyebrow"><span />Unit {unit.number}</p><h1>{unit.name}</h1><p className="detail-copy__lead">{unit.description} A private, considered base for the days you want to remember.</p><div className="detail-stats"><span><Users size={16} /> {unit.guests}</span><span><BedDouble size={16} /> {unit.beds}</span><span><Droplets size={16} /> {unit.bath}</span><span><span className="size-icon">m²</span> {unit.size}</span></div><div className="detail-price"><span>Rates</span><strong>Contact us for rates</strong></div><a className="button button--dark" href="#detail-booking">Book this unit <ArrowUpRight size={16} /></a></div></div></div>
         </section>
-        <section className="detail-information section-light"><div className="container detail-information__grid"><div><SectionIntro eyebrow="A considered stay" title="Everything in its place" copy="Thoughtfully prepared for restful nights, slow mornings, and the freedom to make the space your own." /><div className="amenity-list">{amenityList.map((item) => <span key={item}><Check size={15} /> {item}</span>)}</div></div><div className="detail-booking-card" id="detail-booking"><div className="detail-booking-card__top"><span>Availability on request</span><span className="status-dot" /></div><h3>Plan your stay</h3><p>Choose your dates and we will confirm availability with a host.</p><label>Check-in<input type="date" /></label><label>Check-out<input type="date" /></label><div className="guest-stepper"><span>Guests</span><div><button type="button" onClick={() => setGuestCount(Math.max(1, guestCount - 1))} aria-label="Remove guest"><Minus size={15} /></button><strong>{guestCount}</strong><button type="button" onClick={() => setGuestCount(Math.min(8, guestCount + 1))} aria-label="Add guest"><Plus size={15} /></button></div></div><button className="button button--gold" type="button" onClick={() => toast.success("Enquiry started", { description: `We will check Unit ${unit.number} for your dates.` })}>Check availability <ArrowUpRight size={16} /></button><small className="detail-booking-card__note">No payment is required to enquire.</small></div></div></section>
+        <section className="detail-information section-light"><div className="container detail-information__grid"><div><SectionIntro eyebrow="A considered stay" title="Everything in its place" copy="Thoughtfully prepared for restful nights, slow mornings, and the freedom to make the space your own." /><div className="amenity-list">{amenityList.map((item) => <span key={item}><Check size={15} /> {item}</span>)}</div></div><div className="detail-booking-card"><div className="detail-booking-card__top"><span>Availability on request</span><span className="status-dot" /></div><BookingForm id="detail-booking" variant="card" idPrefix={`unit-${unit.id}`} defaultUnitId={unit.id} /></div></div></section>
         <section className="detail-quote section-teal"><div className="container"><p>“</p><blockquote>Space to breathe, room to reconnect,<br />and a softer way to stay.</blockquote><span>— Le Grand Homestay</span></div></section>
       </main>
       <Footer />
