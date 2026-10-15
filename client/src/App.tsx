@@ -3,16 +3,13 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Home, { UnitDetail } from "./pages/Home";
-import MediaAdmin from "./pages/MediaAdmin";
+import NotFound from "./pages/NotFound";
 function Router() {
-  // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/unit/:id" component={UnitDetail} />
-      <Route path="/admin" component={MediaAdmin} />
-      <Route path="/admin/media" component={MediaAdmin} />
-      <Route component={Home} />
+      <Route component={NotFound} />
     </Switch>
   );
 }
