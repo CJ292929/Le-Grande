@@ -2,6 +2,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
+import BookingModal from "./components/BookingModal";
+import { BookingModalProvider } from "./contexts/booking-modal";
 import Home, { UnitDetail } from "./pages/Home";
 import NotFound from "./pages/NotFound";
 function Router() {
@@ -19,7 +21,10 @@ export default function App() {
     <ErrorBoundary>
       <TooltipProvider>
         <Toaster position="top-right" />
-        <Router />
+        <BookingModalProvider>
+          <Router />
+          <BookingModal />
+        </BookingModalProvider>
       </TooltipProvider>
     </ErrorBoundary>
   );

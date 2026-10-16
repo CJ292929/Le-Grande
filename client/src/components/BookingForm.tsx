@@ -1,98 +1,32 @@
-import { useRef, useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowUpRight, CalendarDays, Loader2, Users } from "lucide-react";
+import type { UseFormReturn } from "react-hook-form";
 import { units } from "@shared/units";
-import { BOOKING_HONEYPOT_FIELD, bookingFormSchema, type BookingFormValues } from "@shared/booking";
-import { fingerprintOf, requestIdFor, submitBooking } from "@/lib/booking";
-
-type Variant = "bar" | "card";
-
-type BookingFormProps = {
-  variant: Variant;
-  defaultUnitId?: string;
-  idPrefix: string;
-  id?: string;
-};
+import { BOOKING_HONEYPOT_FIELD, type BookingFormValues } from "@shared/booking";
 
 type Status =
   | { kind: "idle" }
   | { kind: "success"; requestId: string }
   | { kind: "error"; message: string };
 
-const defaultValuesFor = (defaultUnitId?: string): BookingFormValues => ({
-  fullName: "",
-  email: "",
-  phone: "",
-  unitId: defaultUnitId || units[0].id,
-  checkIn: "",
-  checkOut: "",
-  guests: 2,
-  message: "",
-  [BOOKING_HONEYPOT_FIELD]: "",
-});
+type BookingFormProps = {
+  form: UseFormReturn<BookingFormValues>;
+  status: Status;
+  isSubmitting: boolean;
+  onSubmit: () => void;
+  idPrefix: string;
+};
 
-export default function BookingForm({ variant, defaultUnitId, idPrefix, id }: BookingFormProps) {
+export default function BookingForm({ form, status, isSubmitting, onSubmit, idPrefix }: BookingFormProps) {
   const {
     register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-    reset,
-  } = useForm<BookingFormValues>({
-    resolver: zodResolver(bookingFormSchema),
-    defaultValues: defaultValuesFor(defaultUnitId),
-  });
-
-  const [status, setStatus] = useState<Status>({ kind: "idle" });
-  const lastAttempt = useRef<{ fingerprint: string; requestId: string } | null>(null);
-
-  const onSubmit = handleSubmit(async (values) => {
-    const fingerprint = fingerprintOf(values);
-    const requestId = requestIdFor(fingerprint, lastAttempt.current);
-
-    const result = await submitBooking(values, requestId);
-
-    if (result.status === "success") {
-      lastAttempt.current = null;
-      setStatus({ kind: "success", requestId: result.requestId });
-      reset(defaultValuesFor(defaultUnitId));
-      return;
-    }
-
-    lastAttempt.current = { fingerprint, requestId };
-    if (result.status === "invalid" || result.status === "conflict" || result.status === "unavailable") {
-      setStatus({ kind: "error", message: result.error });
-    } else {
-      setStatus({
-        kind: "error",
-        message: "We couldn't confirm your booking request was saved. Please try again — your details are still here.",
-      });
-    }
-  });
+    formState: { errors },
+  } = form;
 
   const fieldId = (name: string) => `${idPrefix}-${name}`;
   const errorId = (name: string) => (errors[name as keyof BookingFormValues] ? `${idPrefix}-${name}-error` : undefined);
 
   return (
-    <form
-      id={id}
-      className={variant === "bar" ? "booking-form booking-form--bar" : "booking-form booking-form--card"}
-      onSubmit={onSubmit}
-      noValidate
-    >
-      {variant === "bar" && (
-        <div className="booking-form__intro">
-          <span className="booking-bar__kicker">Begin your stay</span>
-          <strong>Plan your escape</strong>
-        </div>
-      )}
-      {variant === "card" && (
-        <>
-          <h3>Plan your stay</h3>
-          <p>Send a booking request and we will confirm availability with a host.</p>
-        </>
-      )}
-
+    <form className="booking-form booking-form--modal" onSubmit={onSubmit} noValidate>
       <div className="booking-form__grid">
         <label className="booking-form__field" htmlFor={fieldId("fullName")}>
           <span>Full name</span>
@@ -186,7 +120,7 @@ export default function BookingForm({ variant, defaultUnitId, idPrefix, id }: Bo
           <span>Message (optional)</span>
           <textarea
             id={fieldId("message")}
-            rows={variant === "bar" ? 2 : 3}
+            rows={3}
             maxLength={1000}
             aria-invalid={!!errors.message}
             aria-describedby={errorId("message")}

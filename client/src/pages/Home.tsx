@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "wouter";
 import { units, type Unit } from "@shared/units";
 import { cardSrcSet, coverFor, mediaFor, MediaImage, PLACEHOLDER_IMAGE, STATIC_MEDIA, variantUrl, VARIANT_SIZE, type PublicMedia } from "@/lib/media";
-import BookingForm from "@/components/BookingForm";
+import BookingTrigger from "@/components/BookingTrigger";
+import { useMotionPreference } from "@/hooks/use-motion-preference";
 import {
   ArrowDownRight,
   ArrowLeft,
@@ -17,8 +18,6 @@ import {
   Menu,
   MinusCircle,
   MapPin,
-  Pause,
-  Play,
   Search,
   ShieldCheck,
   Sparkles,
@@ -31,43 +30,19 @@ import {
 const HERO_VIDEO_SRC = "/media/hero.mp4";
 const HERO_VIDEO_POSTER = "/media/hero-poster.jpg";
 
-function HeroMedia({ poster, alt }: { poster: string; alt: string }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [allowVideo, setAllowVideo] = useState(
-    () => typeof window === "undefined" || !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
-  );
+function HeroMedia({ poster, alt, reduceMotion }: { poster: string; alt: string; reduceMotion: boolean }) {
   const [videoReady, setVideoReady] = useState(false);
   const [videoFailed, setVideoFailed] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(true);
 
-  useEffect(() => {
-    if (typeof window === "undefined" || !window.matchMedia) return;
-    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const handleChange = (event: MediaQueryListEvent) => setAllowVideo(!event.matches);
-    query.addEventListener("change", handleChange);
-    return () => query.removeEventListener("change", handleChange);
-  }, []);
-
-  const showVideo = allowVideo && !videoFailed;
-
-  const togglePlayback = () => {
-    const video = videoRef.current;
-    if (!video) return;
-    if (video.paused) {
-      video.play();
-      setIsPlaying(true);
-    } else {
-      video.pause();
-      setIsPlaying(false);
-    }
-  };
+  // When reduceMotion is true, the <video> element is never rendered, so
+  // the browser never issues a request for hero.mp4.
+  const showVideo = !reduceMotion && !videoFailed;
 
   return (
     <>
       <img className="hero__image" src={poster} alt={alt} fetchPriority="high" />
       {showVideo && (
         <video
-          ref={videoRef}
           className={`hero__image hero__video ${videoReady ? "is-ready" : ""}`}
           src={HERO_VIDEO_SRC}
           poster={poster}
@@ -80,17 +55,6 @@ function HeroMedia({ poster, alt }: { poster: string; alt: string }) {
           onCanPlay={() => setVideoReady(true)}
           onError={() => setVideoFailed(true)}
         />
-      )}
-      {showVideo && !videoFailed && (
-        <button
-          type="button"
-          className="hero__video-toggle"
-          onClick={togglePlayback}
-          aria-label={isPlaying ? "Pause background video" : "Play background video"}
-          aria-pressed={!isPlaying}
-        >
-          {isPlaying ? <Pause size={16} aria-hidden="true" /> : <Play size={16} aria-hidden="true" />}
-        </button>
       )}
     </>
   );
@@ -133,12 +97,9 @@ function Header() {
               {label}
             </a>
           ))}
-          <a className="nav-action nav-action--outline" href="#booking" onClick={() => setOpen(false)}>
-            Check availability
-          </a>
-          <a className="nav-action nav-action--gold" href="#booking" onClick={() => setOpen(false)}>
-            Book now <ArrowUpRight size={15} />
-          </a>
+          <BookingTrigger className="nav-action nav-action--gold">
+            Request a booking <ArrowUpRight size={15} />
+          </BookingTrigger>
         </nav>
         <button className="mobile-menu" type="button" aria-label={open ? "Close menu" : "Open menu"} onClick={() => setOpen(!open)}>
           {open ? <X size={22} /> : <Menu size={22} />}
@@ -155,17 +116,6 @@ function SectionIntro({ eyebrow, title, copy, light = false }: { eyebrow: string
       <h2>{title}</h2>
       {copy && <p className="section-intro__copy">{copy}</p>}
     </div>
-  );
-}
-
-function BookingBar({ preselectedUnit = "" }: { preselectedUnit?: string }) {
-  return (
-    <BookingForm
-      id="booking"
-      variant="bar"
-      idPrefix="home-booking"
-      defaultUnitId={preselectedUnit || undefined}
-    />
   );
 }
 
@@ -205,7 +155,7 @@ function UnitCard({ unit, media }: { unit: Unit; media: PublicMedia[] }) {
         </div>
         <div className="unit-card__footer">
           <Link className="text-link" href={`/unit/${unit.id}`}>View unit <ArrowUpRight size={16} /></Link>
-          <a className="button button--small button--dark" href="#booking">Book now</a>
+          <BookingTrigger unitId={unit.id} className="button button--small button--dark">Book now</BookingTrigger>
         </div>
       </div>
     </article>
@@ -298,6 +248,7 @@ export default function Home() {
   const media = STATIC_MEDIA;
   const hero = coverFor(media, "hero");
   const welcome = coverFor(media, "property-gallery") || hero;
+  const { reduceMotion, manualReduce, setManualPreference } = useMotionPreference();
   return (
     <div className="site-shell">
       <Header />
@@ -306,25 +257,23 @@ export default function Home() {
           <HeroMedia
             poster={HERO_VIDEO_POSTER}
             alt={hero?.imageAlt || "Le Grand Homestay residence interior"}
+            reduceMotion={reduceMotion}
           />
           <div className="hero__overlay" />
           <div className="hero__grain" />
           <div className="container hero__content">
             <p className="hero__eyebrow">Stay · relax · experience</p>
-            <h1>Le Grand Homestay</h1>
-            <div className="hero__rule" />
-            <p className="hero__tagline">Your private escape<br />in paradise.</p>
-            <p className="hero__copy">An elegant stay designed for comfort, relaxation, and unforgettable moments.</p>
+            <h1 className="hero__title">LE GRAND<br />HOMESTAY</h1>
             <div className="hero__actions">
-              <a className="button button--gold" href="#units">Explore our units <ArrowDownRight size={16} /></a>
-              <a className="button button--ghost" href="#booking">Check availability <ArrowUpRight size={16} /></a>
+              <a className="button button--ghost" href="#units">Explore our units <ArrowDownRight size={16} /></a>
+              <BookingTrigger className="button button--gold">Check availability <ArrowUpRight size={16} /></BookingTrigger>
             </div>
           </div>
-          <div className="hero__scroll"><span /> Scroll to discover</div>
-          <div className="hero__side-label">A private collection of four residences</div>
+          <div className="hero__info-strip">
+            <span className="hero__info-count">04<br /><small>residences</small></span>
+            <span className="hero__info-location"><MapPin size={14} /> Arella Residences, Bay, Laguna</span>
+          </div>
         </section>
-
-        <div className="booking-wrap container"><BookingBar /></div>
 
         <section className="welcome section-ivory" id="welcome">
           <div className="container welcome__grid">
@@ -365,11 +314,11 @@ export default function Home() {
             <p className="eyebrow eyebrow--gold"><span />Le Grand Homestay</p>
             <h2>Make your next escape<br /><em>extraordinary.</em></h2>
             <p>Four beautiful spaces. One unforgettable destination.</p>
-            <a className="button button--gold" href="#booking">Book your stay <ArrowUpRight size={16} /></a>
+            <BookingTrigger className="button button--gold">Book your stay <ArrowUpRight size={16} /></BookingTrigger>
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer manualReduce={manualReduce} setManualPreference={setManualPreference} />
     </div>
   );
 }
@@ -394,26 +343,27 @@ export function UnitDetail() {
   const galleryImages = showAllPhotos ? allGalleryImages : allGalleryImages.slice(0, visibleCount);
   const remainingPhotoCount = allGalleryImages.length - visibleCount;
   const activeImageSrc = activeImage === PLACEHOLDER_IMAGE ? PLACEHOLDER_IMAGE : variantUrl(activeImage, "full");
+  const { manualReduce, setManualPreference } = useMotionPreference();
 
   return (
     <div className="site-shell detail-page">
       <Header />
       <main>
         <section className="detail-hero section-ivory">
-          <div className="container"><Link className="back-link" href="/#units"><ArrowLeft size={15} /> Back to residences</Link><div className="detail-hero__grid"><div className="detail-gallery"><div className="detail-gallery__main"><MediaImage src={activeImageSrc} alt={unit.name} width={VARIANT_SIZE.full.width} height={VARIANT_SIZE.full.height} /></div><div className="detail-gallery__thumbs">{galleryImages.map((image, index) => <button type="button" key={image.id} className={activeImage === image.imageUrl ? "is-active" : ""} onClick={() => setActiveImage(image.imageUrl)}><MediaImage src={variantUrl(image.imageUrl, "thumb")} width={VARIANT_SIZE.thumb.width} height={VARIANT_SIZE.thumb.height} alt={image.imageAlt || `${unit.name} view ${index + 1}`} loading={index === 0 ? undefined : "lazy"} /></button>)}</div>{remainingPhotoCount > 0 && !showAllPhotos && <button type="button" className="text-link detail-gallery__view-all" onClick={() => setShowAllPhotos(true)}>View all {allGalleryImages.length} photos <ArrowUpRight size={16} /></button>}</div><div className="detail-copy"><p className="eyebrow"><span />Unit {unit.number}</p><h1>{unit.name}</h1><p className="detail-copy__lead">{unit.description} A private, considered base for the days you want to remember.</p><div className="detail-stats"><span><Users size={16} /> {unit.guests}</span><span><BedDouble size={16} /> {unit.beds}</span><span><Droplets size={16} /> {unit.bath}</span><span><span className="size-icon">m²</span> {unit.size}</span></div><div className="detail-price"><span>Rates</span><strong>Contact us for rates</strong></div><a className="button button--dark" href="#detail-booking">Book this unit <ArrowUpRight size={16} /></a></div></div></div>
+          <div className="container"><Link className="back-link" href="/#units"><ArrowLeft size={15} /> Back to residences</Link><div className="detail-hero__grid"><div className="detail-gallery"><div className="detail-gallery__main"><MediaImage src={activeImageSrc} alt={unit.name} width={VARIANT_SIZE.full.width} height={VARIANT_SIZE.full.height} /></div><div className="detail-gallery__thumbs">{galleryImages.map((image, index) => <button type="button" key={image.id} className={activeImage === image.imageUrl ? "is-active" : ""} onClick={() => setActiveImage(image.imageUrl)}><MediaImage src={variantUrl(image.imageUrl, "thumb")} width={VARIANT_SIZE.thumb.width} height={VARIANT_SIZE.thumb.height} alt={image.imageAlt || `${unit.name} view ${index + 1}`} loading={index === 0 ? undefined : "lazy"} /></button>)}</div>{remainingPhotoCount > 0 && !showAllPhotos && <button type="button" className="text-link detail-gallery__view-all" onClick={() => setShowAllPhotos(true)}>View all {allGalleryImages.length} photos <ArrowUpRight size={16} /></button>}</div><div className="detail-copy"><p className="eyebrow"><span />Unit {unit.number}</p><h1>{unit.name}</h1><p className="detail-copy__lead">{unit.description} A private, considered base for the days you want to remember.</p><div className="detail-stats"><span><Users size={16} /> {unit.guests}</span><span><BedDouble size={16} /> {unit.beds}</span><span><Droplets size={16} /> {unit.bath}</span><span><span className="size-icon">m²</span> {unit.size}</span></div><div className="detail-price"><span>Rates</span><strong>Contact us for rates</strong></div><BookingTrigger unitId={unit.id} className="button button--dark">Book this unit <ArrowUpRight size={16} /></BookingTrigger></div></div></div>
         </section>
-        <section className="detail-information section-light"><div className="container detail-information__grid"><div><SectionIntro eyebrow="A considered stay" title="Everything in its place" copy="Thoughtfully prepared for restful nights, slow mornings, and the freedom to make the space your own." /><div className="amenity-list">{amenityList.map((item) => <span key={item}><Check size={15} /> {item}</span>)}</div></div><div className="detail-booking-card"><div className="detail-booking-card__top"><span>Availability on request</span><span className="status-dot" /></div><BookingForm id="detail-booking" variant="card" idPrefix={`unit-${unit.id}`} defaultUnitId={unit.id} /></div></div></section>
+        <section className="detail-information section-light"><div className="container detail-information__grid"><div><SectionIntro eyebrow="A considered stay" title="Everything in its place" copy="Thoughtfully prepared for restful nights, slow mornings, and the freedom to make the space your own." /><div className="amenity-list">{amenityList.map((item) => <span key={item}><Check size={15} /> {item}</span>)}</div></div><div className="detail-booking-card"><div className="detail-booking-card__top"><span>Availability on request</span><span className="status-dot" /></div><p className="detail-booking-card__copy">Send your dates and guest count — we'll confirm availability for {unit.name} by email.</p><BookingTrigger unitId={unit.id} className="button button--gold detail-booking-card__cta">Request a booking <ArrowUpRight size={16} /></BookingTrigger></div></div></section>
         <section className="detail-quote section-teal"><div className="container"><p>“</p><blockquote>Space to breathe, room to reconnect,<br />and a softer way to stay.</blockquote><span>— Le Grand Homestay</span></div></section>
       </main>
-      <Footer />
+      <Footer manualReduce={manualReduce} setManualPreference={setManualPreference} />
     </div>
   );
 }
 
-function Footer() {
+function Footer({ manualReduce, setManualPreference }: { manualReduce: boolean; setManualPreference: (value: boolean) => void }) {
   return (
     <footer className="footer" id="contact">
-      <div className="container footer__top"><div className="footer__brand"><Wordmark /><p>Your private escape in paradise.</p><div className="footer__social"><a href="#contact" aria-label="Instagram"><Instagram size={17} /></a><a href="#contact" aria-label="Facebook"><Facebook size={17} /></a></div></div><div className="footer__column"><span>Explore</span><a href="/#welcome">Welcome</a><a href="/#units">The units</a><a href="/#amenities">Amenities</a><a href="/#gallery">Gallery</a></div><div className="footer__column"><span>Plan your stay</span><a href="/#booking">Check availability</a><a href="/#booking">Book now</a><a href="/#location">Location</a><a href="mailto:hello@legrande.example">Email us</a></div><div className="footer__column footer__column--contact"><span>Contact</span><p>Arella Residences<br />Bay, Laguna</p><p>Pan-Philippine Highway<br />Brgy. Calo, Laguna 4033</p></div></div><div className="container footer__bottom"><span>© {new Date().getFullYear()} Le Grand Homestay. All rights reserved.</span><span>Arella Residences · Bay, Laguna</span></div>
+      <div className="container footer__top"><div className="footer__brand"><Wordmark /><p>Your private escape in paradise.</p><div className="footer__social"><a href="#contact" aria-label="Instagram"><Instagram size={17} /></a><a href="#contact" aria-label="Facebook"><Facebook size={17} /></a></div></div><div className="footer__column"><span>Explore</span><a href="/#welcome">Welcome</a><a href="/#units">The units</a><a href="/#amenities">Amenities</a><a href="/#gallery">Gallery</a></div><div className="footer__column"><span>Plan your stay</span><BookingTrigger className="footer-link-button">Check availability</BookingTrigger><BookingTrigger className="footer-link-button">Book now</BookingTrigger><a href="/#location">Location</a><a href="mailto:hello@legrande.example">Email us</a></div><div className="footer__column footer__column--contact"><span>Contact</span><p>Arella Residences<br />Bay, Laguna</p><p>Pan-Philippine Highway<br />Brgy. Calo, Laguna 4033</p></div></div><div className="container footer__bottom"><span>© {new Date().getFullYear()} Le Grand Homestay. All rights reserved.</span><label className="motion-toggle"><input type="checkbox" checked={manualReduce} onChange={(event) => setManualPreference(event.target.checked)} /><span>Reduce motion</span></label><span>Arella Residences · Bay, Laguna</span></div>
     </footer>
   );
 }
