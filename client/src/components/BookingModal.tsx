@@ -11,7 +11,7 @@ export default function BookingModal() {
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="booking-modal__overlay" />
         <DialogPrimitive.Content
-          className="booking-modal__content"
+          className="booking-modal__content on-light"
           onCloseAutoFocus={(event) => {
             // Imperative triggers scattered across the page tree aren't
             // Radix's own Dialog.Trigger, so its automatic focus-return

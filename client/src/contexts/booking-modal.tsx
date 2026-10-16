@@ -55,6 +55,9 @@ export function BookingModalProvider({ children }: { children: ReactNode }) {
         form.setValue("unitId", preselected.unitId, { shouldDirty: true });
       }
       openerRef.current = opener ?? (document.activeElement as HTMLElement | null);
+      // Other full-screen dialogs (the gallery lightbox) must never stack behind
+      // this one — tell them to close before the booking dialog takes over.
+      window.dispatchEvent(new Event("lgh:booking-opening"));
       setIsOpen(true);
     },
     [form]
