@@ -69,6 +69,11 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 500; line-height: .95; }
 .hero__scroll { position: absolute; z-index: 1; bottom: 32px; left: 40px; display: flex; align-items: center; gap: 13px; color: rgba(255,255,255,.58); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; }
 .hero__scroll span { display: block; width: 42px; height: 1px; background: var(--gold); }
 .hero__side-label { position: absolute; z-index: 1; right: 41px; bottom: 32px; color: rgba(255,255,255,.52); font-size: 9px; letter-spacing: .15em; text-transform: uppercase; writing-mode: vertical-rl; transform: rotate(180deg); }
+.hero__video { opacity: 0; transition: opacity .6s var(--ease); animation: none; }
+.hero__video.is-ready { opacity: 1; }
+.hero__video-toggle { position: absolute; z-index: 2; bottom: 84px; left: 40px; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border: 1px solid rgba(255,255,255,.4); border-radius: 50%; background: rgba(6,35,45,.45); color: #fff; cursor: pointer; transition: background .2s var(--ease), border-color .2s var(--ease); }
+.hero__video-toggle:hover, .hero__video-toggle:focus-visible { background: rgba(6,35,45,.7); border-color: var(--gold); }
+.hero__video-toggle:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .booking-wrap { position: relative; z-index: 3; margin-top: -58px; }
 .booking-bar { display: grid; grid-template-columns: 1.2fr repeat(4, 1fr) 1.22fr; align-items: stretch; min-height: 112px; background: #fff; box-shadow: 0 20px 55px rgba(14,48,58,.14); }
 .booking-bar__intro { display: flex; flex-direction: column; justify-content: center; padding: 24px 26px; background: var(--teal); color: #fff; }
@@ -284,6 +289,7 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 500; line-height: .95; }
   .hero__tagline { font-size: 36px; }
   .hero__side-label { display: none; }
   .hero__scroll { left: 22px; }
+  .hero__video-toggle { left: 22px; bottom: 72px; }
   .booking-wrap { margin-top: -35px; }
   .booking-bar { display: block; }
   .booking-bar__intro { min-height: 83px; }
@@ -327,6 +333,7 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 500; line-height: .95; }
   .detail-information__grid > .detail-booking-card { margin-top: 62px; }
 }
 @media (max-width: 420px) {
+  .hero__video-toggle { top: 90px; right: 20px; bottom: auto; left: auto; }
   .hero__actions { align-items: stretch; flex-direction: column; max-width: 230px; }
   .hero__actions .button { width: 100%; }
   .unit-card__body { padding: 24px 19px 22px; }

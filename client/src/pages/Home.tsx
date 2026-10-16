@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "wouter";
 import { units, type Unit } from "@shared/units";
 import { cardSrcSet, coverFor, mediaFor, MediaImage, PLACEHOLDER_IMAGE, STATIC_MEDIA, variantUrl, VARIANT_SIZE, type PublicMedia } from "@/lib/media";
@@ -17,6 +17,8 @@ import {
   Menu,
   MinusCircle,
   MapPin,
+  Pause,
+  Play,
   Search,
   ShieldCheck,
   Sparkles,
@@ -25,6 +27,74 @@ import {
   Wifi,
   X,
 } from "lucide-react";
+
+const HERO_VIDEO_SRC = "/media/hero.mp4";
+const HERO_VIDEO_POSTER = "/media/hero-poster.jpg";
+
+function HeroMedia({ poster, alt }: { poster: string; alt: string }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [allowVideo, setAllowVideo] = useState(
+    () => typeof window === "undefined" || !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+  const [videoReady, setVideoReady] = useState(false);
+  const [videoFailed, setVideoFailed] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const handleChange = (event: MediaQueryListEvent) => setAllowVideo(!event.matches);
+    query.addEventListener("change", handleChange);
+    return () => query.removeEventListener("change", handleChange);
+  }, []);
+
+  const showVideo = allowVideo && !videoFailed;
+
+  const togglePlayback = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) {
+      video.play();
+      setIsPlaying(true);
+    } else {
+      video.pause();
+      setIsPlaying(false);
+    }
+  };
+
+  return (
+    <>
+      <img className="hero__image" src={poster} alt={alt} fetchPriority="high" />
+      {showVideo && (
+        <video
+          ref={videoRef}
+          className={`hero__image hero__video ${videoReady ? "is-ready" : ""}`}
+          src={HERO_VIDEO_SRC}
+          poster={poster}
+          autoPlay
+          muted
+          loop
+          playsInline
+          aria-hidden="true"
+          tabIndex={-1}
+          onCanPlay={() => setVideoReady(true)}
+          onError={() => setVideoFailed(true)}
+        />
+      )}
+      {showVideo && !videoFailed && (
+        <button
+          type="button"
+          className="hero__video-toggle"
+          onClick={togglePlayback}
+          aria-label={isPlaying ? "Pause background video" : "Play background video"}
+          aria-pressed={!isPlaying}
+        >
+          {isPlaying ? <Pause size={16} aria-hidden="true" /> : <Play size={16} aria-hidden="true" />}
+        </button>
+      )}
+    </>
+  );
+}
 
 const navItems = [
   ["The units", "#units"],
@@ -233,12 +303,8 @@ export default function Home() {
       <Header />
       <main>
         <section className="hero">
-          <MediaImage
-            className="hero__image"
-            src={hero ? variantUrl(hero.imageUrl, "full") : PLACEHOLDER_IMAGE}
-            width={VARIANT_SIZE.full.width}
-            height={VARIANT_SIZE.full.height}
-            fetchPriority="high"
+          <HeroMedia
+            poster={HERO_VIDEO_POSTER}
             alt={hero?.imageAlt || "Le Grand Homestay residence interior"}
           />
           <div className="hero__overlay" />
