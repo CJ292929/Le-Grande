@@ -201,7 +201,7 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 500; line-height: .95; }
 .booking-form__field-control { margin-top: 7px; }
 .booking-form__error { margin-top: 5px; color: #b4482f; font-size: 10px; font-weight: 600; letter-spacing: .03em; }
 .booking-form__honeypot { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-.booking-form__submit { width: 100%; margin-top: 19px; position: sticky; bottom: 0; }
+.booking-form__submit { width: 100%; margin-top: 19px; }
 .booking-form__submit:disabled { opacity: .62; cursor: not-allowed; transform: none; }
 .booking-form__spinner { animation: spin .8s linear infinite; }
 .booking-form__note { display: block; margin-top: 12px; color: var(--text-secondary-on-light); font-size: 10px; text-align: center; }

@@ -89,6 +89,14 @@ function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // The booking modal must take sole ownership of the screen — close the
+  // mobile nav sheet rather than let both overlays stay open behind it.
+  useEffect(() => {
+    const close = () => setMenuOpen(false);
+    window.addEventListener("lgh:booking-opening", close);
+    return () => window.removeEventListener("lgh:booking-opening", close);
+  }, []);
+
   return (
     <header className={`site-header ${scrolled ? "site-header--scrolled" : ""}`}>
       <div className="container site-header__inner">
